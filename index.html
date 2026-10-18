@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com/; font-src https://fonts.gstatic.com/; img-src 'self' data:; connect-src https://WORKER_HOST_PLACEHOLDER; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Fatih · Roblox Developer</title>
+  <meta name="description" content="Fatih, Roblox developer. Games, builds and systems that break through the ceiling.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;600&family=Chakra+Petch:ital,wght@0,600;0,700;1,600&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <canvas id="galaxy" aria-hidden="true"></canvas>
+
+  <div class="app">
+    <header class="top">
+      <div class="brand">
+        <svg class="emblem" viewBox="0 0 120 120" role="img" aria-label="Team emblem: a flaming skull wearing pointed shades">
+          <defs>
+            <linearGradient id="flameGrad" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0" stop-color="#ff2a1a"/>
+              <stop offset=".55" stop-color="#ff8a00"/>
+              <stop offset="1" stop-color="#ffe14a"/>
+            </linearGradient>
+          </defs>
+          <path class="flames" fill="url(#flameGrad)" d="M18 92 C10 70 22 58 20 38 C30 50 30 58 34 60 C34 40 44 26 42 6 C56 22 54 40 58 46 C62 30 74 22 76 4 C84 22 80 40 82 48 C88 40 96 36 100 24 C104 44 96 58 100 66 C108 60 110 52 112 46 C116 66 108 82 102 92 Z"/>
+          <path class="skull" d="M28 70 C28 46 44 34 60 34 C76 34 92 46 92 70 C92 80 86 86 82 88 L82 100 L38 100 L38 88 C34 86 28 80 28 70 Z"/>
+          <path class="shades" d="M22 60 L56 62 L50 76 L34 78 Z M98 60 L64 62 L70 76 L86 78 Z"/>
+          <path class="bridge" d="M56 64 Q60 60 64 64"/>
+          <path class="glint" d="M30 64 L44 66 M74 66 L90 64"/>
+          <path class="teeth" d="M46 92 V100 M54 92 V100 M62 92 V100 M70 92 V100 M44 92 H76"/>
+        </svg>
+        <div class="title-block">
+          <h1 class="name">FATIH</h1>
+          <p class="tagline">Roblox developer. I build worlds that drill straight through the ceiling.</p>
+        </div>
+      </div>
+
+      <div class="meter" aria-live="polite">
+        <span class="meter-label">SPIRAL POWER</span>
+        <svg class="meter-drill" viewBox="0 0 60 140" role="img" aria-label="Spiral power meter">
+          <defs>
+            <clipPath id="drillClip"><path d="M30 4 L54 96 L6 96 Z"/></clipPath>
+          </defs>
+          <path class="md-body" d="M30 4 L54 96 L6 96 Z"/>
+          <g clip-path="url(#drillClip)">
+            <rect id="meterFill" class="md-fill" x="0" y="96" width="60" height="0"/>
+            <path class="md-thread" d="M0 30 L60 18 M0 50 L60 38 M0 70 L60 58 M0 90 L60 78"/>
+          </g>
+          <path class="md-edge" d="M30 4 L54 96 L6 96 Z"/>
+          <rect class="md-collar" x="2" y="96" width="56" height="14" rx="3"/>
+          <rect class="md-shank" x="22" y="110" width="16" height="26" rx="2"/>
+        </svg>
+        <span class="meter-value" id="meterValue">0%</span>
+        <p class="meter-hype" id="meterHype" hidden></p>
+      </div>
+    </header>
+
+    <nav class="menu" aria-label="Sections">
+      <ul id="menuList" role="tablist" aria-orientation="vertical"></ul>
+      <p class="hint"><kbd>↑</kbd><kbd>↓</kbd> to move</p>
+    </nav>
+
+    <main class="panel" id="panel" role="tabpanel" tabindex="-1"></main>
+
+    <footer class="foot">© <span id="year"></span> Fatih · Fan design inspired by Gurren Lagann. All artwork and text here are original.</footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

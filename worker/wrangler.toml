@@ -1,0 +1,12 @@
+name = "fatih-reviews"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+
+# Only this site may post reviews (your GitHub Pages origin, no trailing slash).
+[vars]
+ALLOWED_ORIGIN = "https://brochacho00.github.io"
+
+# KV namespace id is not a secret; it only works with your Cloudflare login.
+[[kv_namespaces]]
+binding = "REVIEWS_KV"
+id = "KV_ID_PLACEHOLDER"
