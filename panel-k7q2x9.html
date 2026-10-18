@@ -21,11 +21,13 @@
     </header>
 
     <section class="adm-card" id="login">
-      <h2 class="adm-h">Enter your admin password</h2>
+      <h2 class="adm-h">Sign in</h2>
       <form id="login-form" class="adm-form" novalidate>
-        <label class="lbl" for="pw">Password</label>
+        <label class="lbl" for="worker-url">Worker URL</label>
+        <input id="worker-url" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://….workers.dev">
+        <label class="lbl" for="pw">Token</label>
         <input id="pw" type="password" autocomplete="current-password" spellcheck="false">
-        <label class="adm-check"><input type="checkbox" id="remember"> Remember on this device</label>
+        <p class="rev-note">Both stay only in this tab and are cleared when you close it.</p>
         <div class="form-actions">
           <button class="act" type="submit">Open</button>
           <p class="form-status" id="login-status" aria-live="polite"></p>
@@ -56,6 +58,6 @@
       </section>
     </div>
   </main>
-  <script src="admin.js?v=2"></script>
+  <script src="admin.js?v=3"></script>
 </body>
 </html>

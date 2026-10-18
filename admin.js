@@ -1,8 +1,8 @@
 'use strict';
 
-/* Hidden admin page. The password is checked by the Worker (ADMIN_KEY secret);
-   nothing secret lives in this file. */
-const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
+/* Hidden admin page. Nothing secret lives in this file: you type the admin URL
+   (Worker address + secret ADMIN_PATH) and the token when you sign in, and the
+   Worker checks both. They are kept only in this tab and are gone when it closes. */
 const STORE_KEY = 'brochacho-admin';
 
 (() => {
@@ -20,23 +20,39 @@ const STORE_KEY = 'brochacho-admin';
   };
 
   let password = '';
+  let adminUrl = '';
   const readStored = () => {
-    try { return sessionStorage.getItem(STORE_KEY) || localStorage.getItem(STORE_KEY) || ''; } catch (e) { return ''; }
-  };
-  const store = (pw, remember) => {
     try {
-      sessionStorage.setItem(STORE_KEY, pw);
-      if (remember) localStorage.setItem(STORE_KEY, pw); else localStorage.removeItem(STORE_KEY);
-    } catch (e) { /* storage blocked: stay logged in for this page only */ }
+      const s = JSON.parse(sessionStorage.getItem(STORE_KEY) || 'null');
+      return s && typeof s.url === 'string' && typeof s.token === 'string' ? s : null;
+    } catch (e) { return null; }
+  };
+  const store = (url, token) => {
+    try { sessionStorage.setItem(STORE_KEY, JSON.stringify({ url, token })); } catch (e) { /* storage blocked: this page only */ }
   };
   const forget = () => {
     try { sessionStorage.removeItem(STORE_KEY); localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ }
   };
 
+  // "https://x.workers.dev/secret-path/" -> "https://x.workers.dev/secret-path", or "" if not usable.
+  function cleanAdminUrl(input) {
+    try {
+      const u = new URL(String(input || '').trim());
+      const path = u.pathname.replace(/\/+$/, '');
+      if (u.protocol !== 'https:' || !path || path === '/' || u.search || u.hash) return '';
+      return u.origin + path;
+    } catch (e) { return ''; }
+  }
+
   async function api(method, path, body) {
+    if (!adminUrl || !password) {
+      const err = new Error('Sign in with the Worker URL and token first.');
+      err.status = 401;
+      throw err;
+    }
     const headers = { Authorization: 'Bearer ' + password };
     if (body !== undefined) headers['Content-Type'] = 'application/json';
-    const res = await fetch(WORKER_URL + path, {
+    const res = await fetch(adminUrl + path, {
       method,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body)
@@ -77,7 +93,7 @@ const STORE_KEY = 'brochacho-admin';
   async function loadCodes() {
     const list = $('codes');
     try {
-      const { codes } = await api('GET', '/admin/codes');
+      const { codes } = await api('GET', '/codes');
       if (!codes.length) { list.replaceChildren(el('li', 'empty', 'No codes yet.')); return; }
       list.replaceChildren(...codes.map(c => {
         const used = !!c.used_at;
@@ -86,7 +102,7 @@ const STORE_KEY = 'brochacho-admin';
         const draw = () => {
           const del = button('Delete');
           del.addEventListener('click', () => confirmRow(li, 'Delete the code for ' + who + '?', async () => {
-            try { await api('DELETE', '/admin/codes/' + c.id); $('code-status').textContent = 'Code deleted.'; loadCodes(); }
+            try { await api('DELETE', '/codes/' + c.id); $('code-status').textContent = 'Code deleted.'; loadCodes(); }
             catch (e) { $('code-status').textContent = e.message; draw(); }
           }, draw));
           li.replaceChildren(
@@ -108,7 +124,7 @@ const STORE_KEY = 'brochacho-admin';
     const btn = $('new-code');
     btn.disabled = true;
     try {
-      const { code, client } = await api('POST', '/admin/codes', { client: $('client').value.trim() });
+      const { code, client } = await api('POST', '/codes', { client: $('client').value.trim() });
       const box = $('fresh');
       const cp = button('Copy', 'act small');
       cp.addEventListener('click', () => copy(code, cp));
@@ -128,7 +144,7 @@ const STORE_KEY = 'brochacho-admin';
   async function loadReviews() {
     const list = $('reviews');
     try {
-      const { reviews } = await api('GET', '/admin/reviews');
+      const { reviews } = await api('GET', '/reviews');
       if (!reviews.length) { list.replaceChildren(el('li', 'empty', 'No reviews yet.')); return; }
       list.replaceChildren(...reviews.map(r => {
         const li = el('li', r.hidden ? 'hidden-review' : '');
@@ -137,14 +153,14 @@ const STORE_KEY = 'brochacho-admin';
           const toggle = button(r.hidden ? 'Show' : 'Hide');
           toggle.addEventListener('click', async () => {
             try {
-              await api('POST', '/admin/reviews/' + r.id, { hidden: !r.hidden });
+              await api('POST', '/reviews/' + r.id, { hidden: !r.hidden });
               $('rev-status').textContent = r.hidden ? 'Review is visible again.' : 'Review hidden from the site.';
               loadReviews();
             } catch (e) { handleError(e, 'rev-status'); }
           });
           const del = button('Delete');
           del.addEventListener('click', () => confirmRow(li, 'Delete the review from ' + r.name + ' for good?', async () => {
-            try { await api('DELETE', '/admin/reviews/' + r.id); $('rev-status').textContent = 'Review deleted.'; loadReviews(); }
+            try { await api('DELETE', '/reviews/' + r.id); $('rev-status').textContent = 'Review deleted.'; loadReviews(); }
             catch (e) { $('rev-status').textContent = e.message; draw(); }
           }, draw));
           const meta = String(r.name || '') + ' · ' + day(r.created_at) + (r.client ? ' · code for ' + r.client : '');
@@ -168,6 +184,7 @@ const STORE_KEY = 'brochacho-admin';
   }
 
   function showBoard() {
+    if (!adminUrl || !password) { logout(''); return; }
     $('login').hidden = true;
     $('board').hidden = false;
     $('logout').hidden = false;
@@ -177,29 +194,40 @@ const STORE_KEY = 'brochacho-admin';
 
   function logout(msg) {
     password = '';
+    adminUrl = '';
     forget();
+    $('codes').replaceChildren();
+    $('reviews').replaceChildren();
+    $('fresh').replaceChildren();
+    $('fresh').hidden = true;
+    $('worker-url').value = '';
     $('board').hidden = true;
     $('logout').hidden = true;
     $('login').hidden = false;
     $('login-status').textContent = msg || '';
     $('pw').value = '';
-    $('pw').focus();
+    $('worker-url').focus();
   }
 
   $('login-form').addEventListener('submit', async e => {
     e.preventDefault();
+    const url = cleanAdminUrl($('worker-url').value);
     const pw = $('pw').value.trim();
-    if (!pw) { $('login-status').textContent = 'Enter the password.'; return; }
+    if (!url) { $('login-status').textContent = 'Enter the full Worker URL, including the secret path.'; return; }
+    if (!pw) { $('login-status').textContent = 'Enter the token.'; return; }
+    adminUrl = url;
     password = pw;
     $('login-status').textContent = 'Checking…';
     try {
-      await api('GET', '/admin/check');
-      store(pw, $('remember').checked);
+      await api('GET', '/check');
+      store(url, pw);
       $('login-status').textContent = '';
       showBoard();
     } catch (err) {
+      adminUrl = '';
       password = '';
-      $('login-status').textContent = err.status === 401 ? 'Wrong password.' : (err.message || 'Could not reach the server.');
+      // A wrong path and a wrong token both just fail; the server does not say which one.
+      $('login-status').textContent = err.status === 429 ? err.message : 'Wrong Worker URL or token.';
     }
   });
 
@@ -207,7 +235,8 @@ const STORE_KEY = 'brochacho-admin';
 
   const saved = readStored();
   if (saved) {
-    password = saved;
-    api('GET', '/admin/check').then(showBoard, () => logout(''));
+    adminUrl = cleanAdminUrl(saved.url);
+    password = saved.token;
+    api('GET', '/check').then(showBoard, () => logout(''));
   }
 })();

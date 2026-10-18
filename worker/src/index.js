@@ -3,14 +3,14 @@
 // Public:
 //   GET  /reviews              latest 100 visible reviews + average rating
 //   POST /reviews              { code, name, text, stars }
-// Admin (Authorization: Bearer <ADMIN_KEY>):
-//   GET    /admin/check
-//   GET    /admin/codes        list codes (client, dates, status; the code itself is never stored)
-//   POST   /admin/codes        { client } -> creates a code and returns it once
-//   DELETE /admin/codes/:id
-//   GET    /admin/reviews      all reviews, hidden ones included
-//   POST   /admin/reviews/:id  { hidden: true|false }
-//   DELETE /admin/reviews/:id
+// Admin, only under the secret path /<ADMIN_PATH>/ and with Authorization: Bearer <ADMIN_KEY>:
+//   GET    /<ADMIN_PATH>/check
+//   GET    /<ADMIN_PATH>/codes        list codes (client, dates, status; the code itself is never stored)
+//   POST   /<ADMIN_PATH>/codes        { client } -> creates a code and returns it once
+//   DELETE /<ADMIN_PATH>/codes/:id
+//   GET    /<ADMIN_PATH>/reviews      all reviews, hidden ones included
+//   POST   /<ADMIN_PATH>/reviews/:id  { hidden: true|false }
+//   DELETE /<ADMIN_PATH>/reviews/:id
 
 const MAX_BODY = 4000;          // bytes
 const MAX_NAME = 40;
@@ -53,6 +53,7 @@ function configured(env) {
   return !!env.DB &&
     typeof env.ALLOWED_ORIGIN === 'string' && env.ALLOWED_ORIGIN.startsWith('https://') &&
     typeof env.ADMIN_KEY === 'string' && env.ADMIN_KEY.length >= 20 &&
+    typeof env.ADMIN_PATH === 'string' && /^[A-Za-z0-9_-]{16,}$/.test(env.ADMIN_PATH) &&
     typeof env.CODE_PEPPER === 'string' && env.CODE_PEPPER.length >= 32 &&
     typeof env.IP_SALT === 'string' && env.IP_SALT.length >= 32;
 }
@@ -204,10 +205,10 @@ async function handleAdmin(request, env, origin, path) {
     return json({ error: 'Wrong password.' }, 401, origin, env);
   }
 
-  const parts = path.split('/').filter(Boolean); // ["admin", kind, id?]
-  const kind = parts[1];
-  const id = parts[2] !== undefined ? Number(parts[2]) : null;
-  if (parts.length > 3 || (parts[2] !== undefined && !Number.isInteger(id))) return json({ error: 'Not found.' }, 404, origin, env);
+  const parts = path.split('/').filter(Boolean); // [kind, id?] (after the secret admin path)
+  const kind = parts[0];
+  const id = parts[1] !== undefined ? Number(parts[1]) : null;
+  if (parts.length > 2 || (parts[1] !== undefined && !Number.isInteger(id))) return json({ error: 'Not found.' }, 404, origin, env);
   const m = request.method;
 
   if (kind === 'check' && m === 'GET' && id === null) return json({ ok: true }, 200, origin, env);
@@ -269,7 +270,11 @@ export default {
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(origin, env) });
 
     try {
-      if (url.pathname.startsWith('/admin/')) return await handleAdmin(request, env, origin, url.pathname);
+      // Admin lives only under the secret ADMIN_PATH; any other path looks like a normal 404.
+      const adminPrefix = '/' + env.ADMIN_PATH + '/';
+      if (url.pathname.length > adminPrefix.length && safeEqual(url.pathname.slice(0, adminPrefix.length), adminPrefix)) {
+        return await handleAdmin(request, env, origin, url.pathname.slice(adminPrefix.length));
+      }
       if (url.pathname === '/reviews') {
         if (request.method === 'GET') return await getReviews(env, origin);
         if (request.method === 'POST') return await postReview(request, env, origin);

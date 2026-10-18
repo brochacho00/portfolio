@@ -13,6 +13,7 @@ database_name = "fatih-reviews"
 database_id = "01a84416-bc3d-4607-b146-4eaa643783c8"
 
 # Secrets (set with `npx wrangler@4 secret put NAME`, never stored in this repo):
-#   ADMIN_KEY    admin panel password (at least 20 characters)
+#   ADMIN_KEY    admin token (at least 20 characters)
+#   ADMIN_PATH   secret URL path for the admin API (at least 16 letters/digits)
 #   CODE_PEPPER  key used to hash review codes (at least 32 characters)
 #   IP_SALT      key used to hash IP addresses (at least 32 characters)
