@@ -230,7 +230,7 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
     return { name, stars, text, date: String(r.date || '').slice(0, 10) };
   }
 
-  function renderReviews(list) {
+  function renderReviews(list, stats) {
     revList.replaceChildren(...list.map(r => {
       const li = el('li', 'rev');
       const q = el('blockquote');
@@ -246,8 +246,9 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
     revEmpty.hidden = list.length > 0;
     revEmpty.textContent = 'No reviews yet. Worked with me? Leave the first one below.';
     if (!list.length) { revSummary.hidden = true; badge.hidden = true; return; }
-    const n = list.length;
-    const avg = list.reduce((s, r) => s + r.stars, 0) / n;
+    // The server sends the average and count over all visible reviews (the list holds the latest 100).
+    const n = stats && Number.isInteger(stats.count) && stats.count >= list.length ? stats.count : list.length;
+    const avg = stats && typeof stats.average === 'number' ? stats.average : list.reduce((s, r) => s + r.stars, 0) / list.length;
     revAvg.textContent = avg.toFixed(1);
     revBig.replaceChildren(starsEl(Math.round(avg)));
     revTotal.textContent = n + (n === 1 ? ' review' : ' reviews');
@@ -263,7 +264,7 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
     if (loading && !force) return loading;
     loading = fetch(WORKER_URL + '/reviews', { cache: 'no-store' })
       .then(res => { if (!res.ok) throw new Error(String(res.status)); return res.json(); })
-      .then(data => renderReviews((Array.isArray(data.reviews) ? data.reviews : []).map(clean).filter(Boolean)))
+      .then(data => renderReviews((Array.isArray(data.reviews) ? data.reviews : []).map(clean).filter(Boolean), data))
       .catch(() => {
         revEmpty.hidden = false;
         revEmpty.textContent = 'Reviews could not load right now. Try again later.';
@@ -283,6 +284,7 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
     };
     if (!review.code) { statusEl.textContent = 'Enter the review code I gave you.'; return; }
     if (!review.name || !review.text) { statusEl.textContent = 'Write your name and your review.'; return; }
+    if (review.text.length < 10) { statusEl.textContent = 'Write at least 10 characters.'; return; }
     sendBtn.disabled = true;
     statusEl.textContent = 'Sending…';
     try {

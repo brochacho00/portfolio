@@ -33,10 +33,13 @@ const STORE_KEY = 'brochacho-admin';
     try { sessionStorage.removeItem(STORE_KEY); localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ }
   };
 
-  async function api(method, path) {
+  async function api(method, path, body) {
+    const headers = { Authorization: 'Bearer ' + password };
+    if (body !== undefined) headers['Content-Type'] = 'application/json';
     const res = await fetch(WORKER_URL + path, {
       method,
-      headers: { Authorization: 'Bearer ' + password }
+      headers,
+      body: body === undefined ? undefined : JSON.stringify(body)
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -68,28 +71,29 @@ const STORE_KEY = 'brochacho-admin';
     li.replaceChildren(el('span', 'tag', question), yes, no);
   }
 
-  /* ---- Codes ---- */
+  const day = iso => String(iso || '').slice(0, 10);
+
+  /* ---- Codes (stored hashed: the code text is only known right after creation) ---- */
   async function loadCodes() {
     const list = $('codes');
     try {
       const { codes } = await api('GET', '/admin/codes');
       if (!codes.length) { list.replaceChildren(el('li', 'empty', 'No codes yet.')); return; }
       list.replaceChildren(...codes.map(c => {
-        const li = el('li', c.used ? 'used' : '');
+        const used = !!c.used_at;
+        const li = el('li', used ? 'used' : '');
+        const who = c.client || 'No client name';
         const draw = () => {
-          const parts = [el('span', 'code', c.code), el('span', 'tag', c.used ? 'Used' : 'Unused')];
-          if (!c.used) {
-            const cp = button('Copy');
-            cp.addEventListener('click', () => copy(c.code, cp));
-            parts.push(cp);
-          }
           const del = button('Delete');
-          del.addEventListener('click', () => confirmRow(li, 'Delete ' + c.code + '?', async () => {
-            try { await api('DELETE', '/admin/codes/' + encodeURIComponent(c.code)); $('code-status').textContent = 'Code deleted.'; loadCodes(); }
+          del.addEventListener('click', () => confirmRow(li, 'Delete the code for ' + who + '?', async () => {
+            try { await api('DELETE', '/admin/codes/' + c.id); $('code-status').textContent = 'Code deleted.'; loadCodes(); }
             catch (e) { $('code-status').textContent = e.message; draw(); }
           }, draw));
-          parts.push(del);
-          li.replaceChildren(...parts);
+          li.replaceChildren(
+            el('span', 'code', who),
+            el('span', 'tag', used ? 'Used ' + day(c.used_at) : 'Unused · made ' + day(c.created_at)),
+            del
+          );
         };
         draw();
         return li;
@@ -99,20 +103,22 @@ const STORE_KEY = 'brochacho-admin';
     }
   }
 
-  $('new-code').addEventListener('click', async () => {
+  $('code-form').addEventListener('submit', async e => {
+    e.preventDefault();
     const btn = $('new-code');
     btn.disabled = true;
     try {
-      const { code } = await api('POST', '/admin/codes');
+      const { code, client } = await api('POST', '/admin/codes', { client: $('client').value.trim() });
       const box = $('fresh');
       const cp = button('Copy', 'act small');
       cp.addEventListener('click', () => copy(code, cp));
       box.replaceChildren(el('span', '', code), cp);
       box.hidden = false;
-      $('code-status').textContent = 'New code ready. Send it to your client.';
+      $('code-status').textContent = 'Code for ' + (client || 'your client') + ' is ready. Copy it now: it will not be shown again.';
+      $('client').value = '';
       loadCodes();
-    } catch (e) {
-      handleError(e, 'code-status');
+    } catch (err) {
+      handleError(err, 'code-status');
     } finally {
       btn.disabled = false;
     }
@@ -125,20 +131,27 @@ const STORE_KEY = 'brochacho-admin';
       const { reviews } = await api('GET', '/admin/reviews');
       if (!reviews.length) { list.replaceChildren(el('li', 'empty', 'No reviews yet.')); return; }
       list.replaceChildren(...reviews.map(r => {
-        const li = el('li');
+        const li = el('li', r.hidden ? 'hidden-review' : '');
         const draw = () => {
           const stars = Math.max(1, Math.min(5, Number(r.stars) || 0));
+          const toggle = button(r.hidden ? 'Show' : 'Hide');
+          toggle.addEventListener('click', async () => {
+            try {
+              await api('POST', '/admin/reviews/' + r.id, { hidden: !r.hidden });
+              $('rev-status').textContent = r.hidden ? 'Review is visible again.' : 'Review hidden from the site.';
+              loadReviews();
+            } catch (e) { handleError(e, 'rev-status'); }
+          });
           const del = button('Delete');
-          del.addEventListener('click', () => confirmRow(li, 'Delete the review from ' + r.name + '?', async () => {
-            try { await api('DELETE', '/admin/reviews/' + encodeURIComponent(r.id)); $('rev-status').textContent = 'Review deleted.'; loadReviews(); }
+          del.addEventListener('click', () => confirmRow(li, 'Delete the review from ' + r.name + ' for good?', async () => {
+            try { await api('DELETE', '/admin/reviews/' + r.id); $('rev-status').textContent = 'Review deleted.'; loadReviews(); }
             catch (e) { $('rev-status').textContent = e.message; draw(); }
           }, draw));
-          li.replaceChildren(
-            el('span', 'stars', '★'.repeat(stars) + '☆'.repeat(5 - stars)),
-            el('p', 'rev-body', String(r.text || '')),
-            el('span', 'rev-meta', String(r.name || '') + ' · ' + String(r.date || '')),
-            del
-          );
+          const meta = String(r.name || '') + ' · ' + day(r.created_at) + (r.client ? ' · code for ' + r.client : '');
+          const parts = [el('span', 'stars', '★'.repeat(stars) + '☆'.repeat(5 - stars))];
+          if (r.hidden) parts.push(el('span', 'flag', 'HIDDEN'));
+          parts.push(el('p', 'rev-body', String(r.text || '')), el('span', 'rev-meta', meta), toggle, del);
+          li.replaceChildren(...parts);
         };
         draw();
         return li;

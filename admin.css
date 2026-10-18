@@ -23,7 +23,7 @@ body.admin {
 }
 .adm-h { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: 1.4rem; line-height: 1.2; }
 .adm-form { display: grid; gap: 8px; max-width: 420px; }
-.adm-form input[type="password"] {
+.adm-form input[type="password"], .adm-form input[type="text"] {
   width: 100%;
   padding: 10px 12px;
   font: inherit;
@@ -32,7 +32,9 @@ body.admin {
   border: 1px solid var(--rule);
   border-radius: 0;
 }
-.adm-form input[type="password"]:focus { outline: none; border-color: var(--flame); }
+.adm-form input[type="password"]:focus, .adm-form input[type="text"]:focus { outline: none; border-color: var(--flame); }
+.adm-list .hidden-review { opacity: .55; }
+.adm-list .flag { padding: 2px 8px; font-family: var(--f-hud); font-weight: 700; font-size: .72rem; letter-spacing: .1em; color: var(--ink); background: var(--flame); }
 .adm-check { display: flex; align-items: center; gap: 8px; font-size: .9rem; color: var(--ash); }
 .adm-fresh {
   margin: 0;

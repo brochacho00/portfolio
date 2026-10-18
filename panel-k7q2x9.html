@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,600;0,700;1,600&family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
   <link rel="stylesheet" href="styles.css?v=4">
-  <link rel="stylesheet" href="admin.css?v=1">
+  <link rel="stylesheet" href="admin.css?v=2">
 </head>
 <body class="admin">
   <main class="adm">
@@ -36,11 +36,15 @@
     <div id="board" hidden>
       <section class="adm-card">
         <h2 class="adm-h">Review codes</h2>
-        <p class="rev-note">Make one code per client. They type it in the review form. Each code works once.</p>
-        <div class="form-actions">
-          <button class="act" type="button" id="new-code">New code</button>
-          <p class="form-status" id="code-status" aria-live="polite"></p>
-        </div>
+        <p class="rev-note">Make one code per client. They type it in the review form. Each code works once. Codes are stored encrypted, so a code is shown only once, right after you create it: copy it then.</p>
+        <form class="adm-form" id="code-form" novalidate>
+          <label class="lbl" for="client">Client name</label>
+          <input id="client" type="text" maxlength="60" autocomplete="off" placeholder="Who is this code for?">
+          <div class="form-actions">
+            <button class="act" type="submit" id="new-code">Create code</button>
+            <p class="form-status" id="code-status" aria-live="polite"></p>
+          </div>
+        </form>
         <p class="adm-fresh" id="fresh" hidden></p>
         <ul class="adm-list" id="codes"></ul>
       </section>
@@ -52,6 +56,6 @@
       </section>
     </div>
   </main>
-  <script src="admin.js?v=1"></script>
+  <script src="admin.js?v=2"></script>
 </body>
 </html>

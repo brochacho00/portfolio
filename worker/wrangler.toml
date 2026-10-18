@@ -2,11 +2,17 @@ name = "fatih-reviews"
 main = "src/index.js"
 compatibility_date = "2025-09-01"
 
-# Only this site may post reviews (your GitHub Pages origin, no trailing slash).
+# Only this site may post reviews or use the admin API (no trailing slash).
 [vars]
 ALLOWED_ORIGIN = "https://brochacho00.github.io"
 
-# KV namespace id is not a secret; it only works with your Cloudflare login.
-[[kv_namespaces]]
-binding = "REVIEWS_KV"
-id = "3f9e7b8e13554f2fa090f9fcb1073203"
+# The database id is not a secret; it only works with your Cloudflare login.
+[[d1_databases]]
+binding = "DB"
+database_name = "fatih-reviews"
+database_id = "01a84416-bc3d-4607-b146-4eaa643783c8"
+
+# Secrets (set with `npx wrangler@4 secret put NAME`, never stored in this repo):
+#   ADMIN_KEY    admin panel password (at least 20 characters)
+#   CODE_PEPPER  key used to hash review codes (at least 32 characters)
+#   IP_SALT      key used to hash IP addresses (at least 32 characters)
