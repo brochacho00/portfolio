@@ -9,4 +9,4 @@ ALLOWED_ORIGIN = "https://brochacho00.github.io"
 # KV namespace id is not a secret; it only works with your Cloudflare login.
 [[kv_namespaces]]
 binding = "REVIEWS_KV"
-id = "KV_ID_PLACEHOLDER"
+id = "3f9e7b8e13554f2fa090f9fcb1073203"
