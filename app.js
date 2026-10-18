@@ -32,7 +32,7 @@ const SKILLS = ['UI panels', '3D previews', 'hub stalls', 'NPC dialogue', 'food 
   'egg hatching', 'ride bar', 'player saves', 'Robux purchases', 'economy'];
 
 /* Reviews worker (Cloudflare). If you change it, also change connect-src in index.html. */
-const WORKER_URL = 'https://WORKER_HOST_PLACEHOLDER';
+const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
 
 /* ========================================================= */
 
