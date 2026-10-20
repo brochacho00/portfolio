@@ -2,34 +2,34 @@
 
 /* =========================================================
    EDIT YOUR CONTENT HERE
-   GAMES: one entry per screenshot tab in "My Games".
+   BUILDS: one entry per screenshot tab in "Builds".
      tab     - text on the tab button
      image   - file inside the images/ folder
      alt     - short description of the picture (for screen readers)
      caption - text shown under the picture
-   SKILLS: the "/ tag" list under My Games.
+   SKILLS: the "/ tag" list under Builds.
    ========================================================= */
-const GAMES = [
-  { tab: 'Town', image: 'images/town.webp', alt: 'Maplewood from above: a town hall with a clock tower, a fountain square and market stalls',
-    caption: 'Maplewood: a town hall with a clock tower, a fountain square and market stalls.' },
-  { tab: 'Hill town', image: 'images/hilltown.webp', alt: 'Oakridge from above: a hilltop town with a church among rolling hills',
-    caption: 'Oakridge, a hilltop town with a church, packed tight around its streets.' },
-  { tab: 'Hub', image: 'images/hub.webp', alt: 'Eight empty ranches around a round hub with four striped stalls',
-    caption: 'Eight ranches around the hub. The four stalls in the middle hold my NPCs and shop screens.' },
-  { tab: 'Plaza', image: 'images/plaza.webp', alt: 'A plaza with shop stalls at the far edge and two-floor bases on both sides',
-    caption: 'A plaza with shop stalls along the edge and two-floor bases on both sides.' },
-  { tab: 'Sky track', image: 'images/skytrack.webp', alt: 'A track across floating islands with gates for Maple Valley, Desert Oasis and Red Canyon',
-    caption: 'A track across floating islands, split into zones like Maple Valley, Desert Oasis and Red Canyon.' },
-  { tab: 'Ride', image: 'images/ride.webp', alt: 'A player riding toward the ranch with the Rebirth, Index and Shop buttons, a cash counter and a Dismount button on screen',
-    caption: 'Riding back to the ranch. The Rebirth, Index and Shop buttons, the cash counter and the Dismount button are my UI.' },
-  { tab: 'Carry', image: 'images/carry.webp', alt: 'A player carrying a character through tall grass at night, with the Food, Sell, Gears and Track stalls behind',
-    caption: 'Carrying a character home at night, past the Food, Sell, Gears and Track stalls.' },
-  { tab: 'Radars', image: 'images/radars.webp', alt: 'Six handheld radars in a row, each a different color, above the map',
-    caption: 'The six radars, one for each rarity tier. They are sold at the Gears stall, in the radar shop I built.' }
+const BUILDS = [
+  { tab: 'Arena', image: 'images/arena.jpg', alt: 'A round stone arena with a red spiral inlay, a giant red drill behind it and a fallen red mecha head with golden horns',
+    caption: 'Spiral Crater: a stone fighting ring in a crater, with a giant drill and a fallen mecha head as landmarks.' },
+  { tab: 'Spiral floor', image: 'images/spiral.jpg', alt: 'Player-height view across beveled stone tiles with a red and gold spiral inlay',
+    caption: 'Three spiral arms set into the tiles, gold-edged and tapering out from a green crystal core.' },
+  { tab: 'Giant drill', image: 'images/drill.jpg', alt: 'A huge red drill with a spiral thread stuck at an angle in rubble below the crater wall',
+    caption: 'A giant drill buried in the crater floor, with a spiral thread running up to the tip.' },
+  { tab: 'Mecha head', image: 'images/mecha.jpg', alt: 'A red mecha head with crescent golden horns and glowing eyes, half sunk in tall grass',
+    caption: 'A fallen mecha head made from parts: crescent horn, glowing eyes, layered ear modules and scattered debris.' },
+  { tab: 'Cliff village', image: 'images/village.jpg', alt: 'Stilt houses with lit windows along a cliff, a stone arch gate in the middle and a walkway above',
+    caption: 'A village built into the cliff: stilt houses, lit windows, banners, a walkway and a stone gate into the rock.' },
+  { tab: 'Tunnel gate', image: 'images/gate.jpg', alt: 'Two open plank doors with iron straps leading into a dark corridor lit by hanging lanterns',
+    caption: 'Plank doors with iron straps, rivets and hinges open into the tunnel.' },
+  { tab: 'Dungeon', image: 'images/dungeon.jpg', alt: 'A stone brick corridor with timber frames, candle lanterns on chains and walls, barrels and crates at a strapped door',
+    caption: 'Inside the tunnel: stone bricks, timber frames, candle lanterns that cast shadows, barrels, crates and a double door.' },
+  { tab: 'Houses', image: 'images/houses.jpg', alt: 'Close-up of a wooden house with warm lit windows, shutters, curtains and an iron wall lantern',
+    caption: 'House details up close: lit windows with curtains and shelves, open shutters and an iron lantern with a candle.' }
 ];
 
-const SKILLS = ['UI panels', '3D previews', 'hub stalls', 'NPC dialogue', 'food shop', 'radar shop', 'sell stall',
-  'egg hatching', 'ride bar', 'player saves', 'Robux purchases', 'economy'];
+const SKILLS = ['map layout', 'part-built props', 'terrain', 'lighting', 'stilt houses', 'dungeon interiors',
+  'landmarks', 'detail work', 'optimized builds'];
 
 /* Reviews worker (Cloudflare). If you change it, also change connect-src in index.html. */
 const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
@@ -135,7 +135,7 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
     show(n, onMenu);
   });
 
-  /* ---- My Games screen tabs, built from GAMES ---- */
+  /* ---- Builds screen tabs, built from BUILDS ---- */
   const shotStage = document.getElementById('shot-stage');
   const shot = shotStage.querySelector('.screen');
   const shotImg = shot.querySelector('img');
@@ -143,7 +143,7 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
   const shotCap = document.querySelector('.viewer .cap');
   const tabBox = document.querySelector('.viewer .tabs');
   const pad = n => String(n).padStart(2, '0');
-  const tabs = GAMES.map((g, k) => {
+  const tabs = BUILDS.map((g, k) => {
     const b = el('button', 'chip');
     b.type = 'button';
     b.id = 'shot-tab-' + k;
@@ -157,7 +157,7 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
   SKILLS.forEach(s => skillList.append(el('li', '', s)));
 
   function showShot(k, focus, animate) {
-    const g = GAMES[k];
+    const g = BUILDS[k];
     tabs.forEach((t, j) => {
       t.setAttribute('aria-selected', String(j === k));
       t.tabIndex = j === k ? 0 : -1;
@@ -166,7 +166,7 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
     shotImg.src = g.image;
     shotImg.alt = g.alt;
     shotCap.textContent = g.caption;
-    shotCount.textContent = pad(k + 1) + ' / ' + pad(GAMES.length);
+    shotCount.textContent = pad(k + 1) + ' / ' + pad(BUILDS.length);
     if (animate && !reduce) {
       shot.classList.remove('swap');
       void shot.offsetWidth;
@@ -186,8 +186,8 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
       showShot(n, true, true);
     });
   });
-  if (GAMES.length) showShot(0, false, false);
-  addEventListener('load', () => GAMES.forEach(g => { const p = new Image(); p.src = g.image; }));
+  if (BUILDS.length) showShot(0, false, false);
+  addEventListener('load', () => BUILDS.forEach(g => { const p = new Image(); p.src = g.image; }));
 
   /* ---- Reviews (Cloudflare Worker) ---- */
   const revPanel = document.getElementById('p-reviews');
