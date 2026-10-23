@@ -7,29 +7,49 @@
      image   - file inside the images/ folder
      alt     - short description of the picture (for screen readers)
      caption - text shown under the picture
+     project - key in PROJECTS; its text is shown above the tabs
    SKILLS: the "/ tag" list under Builds.
    ========================================================= */
+const PROJECTS = {
+  blackwood: 'Blackwood Cathedral: a foggy horror map I built, a gothic cathedral with a dark candle-lit nave, a graveyard and a dead forest.',
+  spiral: 'Spiral Crater: a battleground map I built, inspired by Gurren Lagann and The Strongest Battlegrounds.'
+};
+
 const BUILDS = [
-  { tab: 'Arena', image: 'images/arena.jpg', alt: 'A round stone arena with a red spiral inlay, a giant red drill behind it and a fallen red mecha head with golden horns',
+  { project: 'blackwood', tab: 'Approach', image: 'images/cathedral-approach.jpg', alt: 'A misty path between bare dead trees leading to an iron cemetery gate, with a gothic cathedral tower in the fog behind',
+    caption: 'The way in: a muddy path through dead trees, with the churchyard gate and the cathedral tower fading in the fog.' },
+  { project: 'blackwood', tab: 'Cemetery gate', image: 'images/cathedral-gate.jpg', alt: 'Stone gate piers with pinnacles, a wrought iron double gate left ajar, an iron arch with a cross and a hanging lantern',
+    caption: 'Carved stone piers with pinnacles, a wrought iron gate left ajar and a lantern hanging from the arch.' },
+  { project: 'blackwood', tab: 'Graveyard', image: 'images/cathedral-graveyard.jpg', alt: 'Gravestones, crosses, an obelisk and an angel statue on a pedestal as dark silhouettes in thick grey fog',
+    caption: 'Headstones, Celtic crosses, obelisks and angel monuments as silhouettes in the fog, lit by almost nothing.' },
+  { project: 'blackwood', tab: 'Cathedral', image: 'images/cathedral-facade.jpg', alt: 'The cathedral tower and facade looming over the graveyard through dense fog',
+    caption: 'The cathedral looming over the graves: tower, pinnacles and stained glass, all part-built.' },
+  { project: 'blackwood', tab: 'Mausoleum', image: 'images/cathedral-mausoleum.jpg', alt: 'A small gothic mausoleum with pinnacles and a crocketed gable, its iron grille open and candlelight inside',
+    caption: 'The Blackwood family mausoleum: crocketed gable, quatrefoil window, open iron grille and a candle still burning inside.' },
+  { project: 'blackwood', tab: 'Nave', image: 'images/cathedral-nave.jpg', alt: 'A dark cathedral nave with pews, a hanging iron chandelier, a few burning candles and a statue at the far altar',
+    caption: 'Inside: rows of pews in the dark, most candles burnt out, a single chandelier and the altar at the far end.' },
+  { project: 'blackwood', tab: 'Angel', image: 'images/cathedral-angel.jpg', alt: 'A weathered angel statue on a stone pedestal in front of a stained glass window, lit by candles',
+    caption: 'The angel at the altar, lit from below by candles, with a medieval stained glass window behind it.' },
+  { project: 'spiral', tab: 'Arena', image: 'images/arena.jpg', alt: 'A round stone arena with a red spiral inlay, a giant red drill behind it and a fallen red mecha head with golden horns',
     caption: 'Spiral Crater: a stone fighting ring in a crater, with a giant drill and a fallen mecha head as landmarks.' },
-  { tab: 'Spiral floor', image: 'images/spiral.jpg', alt: 'Player-height view across beveled stone tiles with a red and gold spiral inlay',
+  { project: 'spiral', tab: 'Spiral floor', image: 'images/spiral.jpg', alt: 'Player-height view across beveled stone tiles with a red and gold spiral inlay',
     caption: 'Three spiral arms set into the tiles, gold-edged and tapering out from a green crystal core.' },
-  { tab: 'Giant drill', image: 'images/drill.jpg', alt: 'A huge red drill with a spiral thread stuck at an angle in rubble below the crater wall',
+  { project: 'spiral', tab: 'Giant drill', image: 'images/drill.jpg', alt: 'A huge red drill with a spiral thread stuck at an angle in rubble below the crater wall',
     caption: 'A giant drill buried in the crater floor, with a spiral thread running up to the tip.' },
-  { tab: 'Mecha head', image: 'images/mecha.jpg', alt: 'A red mecha head with crescent golden horns and glowing eyes, half sunk in tall grass',
+  { project: 'spiral', tab: 'Mecha head', image: 'images/mecha.jpg', alt: 'A red mecha head with crescent golden horns and glowing eyes, half sunk in tall grass',
     caption: 'A fallen mecha head made from parts: crescent horn, glowing eyes, layered ear modules and scattered debris.' },
-  { tab: 'Cliff village', image: 'images/village.jpg', alt: 'Stilt houses with lit windows along a cliff, a stone arch gate in the middle and a walkway above',
+  { project: 'spiral', tab: 'Cliff village', image: 'images/village.jpg', alt: 'Stilt houses with lit windows along a cliff, a stone arch gate in the middle and a walkway above',
     caption: 'A village built into the cliff: stilt houses, lit windows, banners, a walkway and a stone gate into the rock.' },
-  { tab: 'Tunnel gate', image: 'images/gate.jpg', alt: 'Two open plank doors with iron straps leading into a dark corridor lit by hanging lanterns',
+  { project: 'spiral', tab: 'Tunnel gate', image: 'images/gate.jpg', alt: 'Two open plank doors with iron straps leading into a dark corridor lit by hanging lanterns',
     caption: 'Plank doors with iron straps, rivets and hinges open into the tunnel.' },
-  { tab: 'Dungeon', image: 'images/dungeon.jpg', alt: 'A stone brick corridor with timber frames, candle lanterns on chains and walls, barrels and crates at a strapped door',
+  { project: 'spiral', tab: 'Dungeon', image: 'images/dungeon.jpg', alt: 'A stone brick corridor with timber frames, candle lanterns on chains and walls, barrels and crates at a strapped door',
     caption: 'Inside the tunnel: stone bricks, timber frames, candle lanterns that cast shadows, barrels, crates and a double door.' },
-  { tab: 'Houses', image: 'images/houses.jpg', alt: 'Close-up of a wooden house with warm lit windows, shutters, curtains and an iron wall lantern',
+  { project: 'spiral', tab: 'Houses', image: 'images/houses.jpg', alt: 'Close-up of a wooden house with warm lit windows, shutters, curtains and an iron wall lantern',
     caption: 'House details up close: lit windows with curtains and shelves, open shutters and an iron lantern with a candle.' }
 ];
 
-const SKILLS = ['map layout', 'part-built props', 'terrain', 'lighting', 'stilt houses', 'dungeon interiors',
-  'landmarks', 'detail work', 'optimized builds'];
+const SKILLS = ['map layout', 'gothic architecture', 'horror atmosphere', 'lighting', 'fog and weather', 'terrain',
+  'part-built props', 'dungeon interiors', 'landmarks', 'detail work', 'optimized builds'];
 
 /* Reviews worker (Cloudflare). If you change it, also change connect-src in index.html. */
 const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
@@ -141,6 +161,7 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
   const shotImg = shot.querySelector('img');
   const shotCount = shot.querySelector('.s-count');
   const shotCap = document.querySelector('.viewer .cap');
+  const shotLead = document.querySelector('.viewer .lead-line');
   const tabBox = document.querySelector('.viewer .tabs');
   const pad = n => String(n).padStart(2, '0');
   const tabs = BUILDS.map((g, k) => {
@@ -166,6 +187,7 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
     shotImg.src = g.image;
     shotImg.alt = g.alt;
     shotCap.textContent = g.caption;
+    shotLead.textContent = PROJECTS[g.project] || '';
     shotCount.textContent = pad(k + 1) + ' / ' + pad(BUILDS.length);
     if (animate && !reduce) {
       shot.classList.remove('swap');
