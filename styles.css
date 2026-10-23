@@ -730,3 +730,14 @@ kbd { font: inherit; padding: 2px 6px; border: 1px solid var(--rule); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Builds: map tabs on top and arrows on the screenshot */
+.projects { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.projects .chip { font-size: 1.05rem; padding: 9px 20px; letter-spacing: .04em; }
+.screen { position: relative; }
+.s-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 44px; height: 64px; border: 0;
+  background: rgba(10, 6, 6, .55); color: var(--bone); font-size: 2rem; line-height: 1; cursor: pointer; z-index: 2; }
+.s-nav:hover { background: var(--flame); color: var(--ink); }
+.s-nav:focus-visible { outline: 2px solid var(--flame); outline-offset: 2px; }
+.s-prev { left: 12px; }
+.s-next { right: 12px; }

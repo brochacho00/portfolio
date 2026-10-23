@@ -7,12 +7,12 @@
      image   - file inside the images/ folder
      alt     - short description of the picture (for screen readers)
      caption - text shown under the picture
-     project - key in PROJECTS; its text is shown above the tabs
+     project - key in PROJECTS (name = tab on top, lead = text above the screens)
    SKILLS: the "/ tag" list under Builds.
    ========================================================= */
 const PROJECTS = {
-  blackwood: 'Blackwood Cathedral: a foggy horror map I built, a gothic cathedral with a dark candle-lit nave, a graveyard and a dead forest.',
-  spiral: 'Spiral Crater: a battleground map I built, inspired by Gurren Lagann and The Strongest Battlegrounds.'
+  blackwood: { name: 'Gothic Horror', lead: 'Blackwood Cathedral: a foggy horror map I built, a gothic cathedral with a dark candle-lit nave, a graveyard and a dead forest.' },
+  spiral: { name: 'Battleground', lead: 'Spiral Crater: a battleground map I built, inspired by Gurren Lagann and The Strongest Battlegrounds.' }
 };
 
 const BUILDS = [
@@ -155,7 +155,7 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
     show(n, onMenu);
   });
 
-  /* ---- Builds screen tabs, built from BUILDS ---- */
+  /* ---- Builds: map tabs on top (PROJECTS), screen tabs for the chosen map ---- */
   const shotStage = document.getElementById('shot-stage');
   const shot = shotStage.querySelector('.screen');
   const shotImg = shot.querySelector('img');
@@ -164,21 +164,21 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
   const shotLead = document.querySelector('.viewer .lead-line');
   const tabBox = document.querySelector('.viewer .tabs');
   const pad = n => String(n).padStart(2, '0');
-  const tabs = BUILDS.map((g, k) => {
-    const b = el('button', 'chip');
-    b.type = 'button';
-    b.id = 'shot-tab-' + k;
-    b.setAttribute('role', 'tab');
-    b.setAttribute('aria-controls', 'shot-stage');
-    b.append(el('span', '', g.tab));
-    tabBox.append(b);
-    return b;
-  });
   const skillList = document.querySelector('.viewer .skills');
   SKILLS.forEach(s => skillList.append(el('li', '', s)));
 
+  const projBox = el('div', 'projects');
+  projBox.setAttribute('role', 'tablist');
+  projBox.setAttribute('aria-label', 'Maps');
+  shotStage.parentNode.insertBefore(projBox, shotStage);
+
+  let list = [];
+  let tabs = [];
+  let cur = 0;
+
   function showShot(k, focus, animate) {
-    const g = BUILDS[k];
+    const g = list[k];
+    cur = k;
     tabs.forEach((t, j) => {
       t.setAttribute('aria-selected', String(j === k));
       t.tabIndex = j === k ? 0 : -1;
@@ -187,8 +187,7 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
     shotImg.src = g.image;
     shotImg.alt = g.alt;
     shotCap.textContent = g.caption;
-    shotLead.textContent = PROJECTS[g.project] || '';
-    shotCount.textContent = pad(k + 1) + ' / ' + pad(BUILDS.length);
+    shotCount.textContent = pad(k + 1) + ' / ' + pad(list.length);
     if (animate && !reduce) {
       shot.classList.remove('swap');
       void shot.offsetWidth;
@@ -197,18 +196,68 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
     if (focus) tabs[k].focus();
   }
 
-  tabs.forEach((t, k) => {
-    t.addEventListener('click', () => showShot(k, false, true));
-    t.addEventListener('keydown', e => {
-      const last = tabs.length - 1;
-      const n = { ArrowRight: k === last ? 0 : k + 1, ArrowLeft: k === 0 ? last : k - 1, Home: 0, End: last }[e.key];
+  const projKeys = Object.keys(PROJECTS);
+  const projBtns = projKeys.map((key, i) => {
+    const b = el('button', 'chip proj');
+    b.type = 'button';
+    b.id = 'proj-tab-' + i;
+    b.setAttribute('role', 'tab');
+    b.append(el('span', '', PROJECTS[key].name));
+    b.addEventListener('click', () => showProject(i, false, true));
+    b.addEventListener('keydown', e => {
+      const last = projBtns.length - 1;
+      const n = { ArrowRight: i === last ? 0 : i + 1, ArrowLeft: i === 0 ? last : i - 1 }[e.key];
       if (n === undefined) return;
       e.preventDefault();
       e.stopPropagation();
-      showShot(n, true, true);
+      showProject(n, true, true);
     });
+    projBox.append(b);
+    return b;
   });
-  if (BUILDS.length) showShot(0, false, false);
+
+  function showProject(i, focus, animate) {
+    const key = projKeys[i];
+    projBtns.forEach((b, j) => {
+      b.setAttribute('aria-selected', String(j === i));
+      b.tabIndex = j === i ? 0 : -1;
+    });
+    if (focus) projBtns[i].focus();
+    shotLead.textContent = PROJECTS[key].lead;
+    list = BUILDS.filter(g => g.project === key);
+    tabBox.textContent = '';
+    tabs = list.map((g, k) => {
+      const b = el('button', 'chip');
+      b.type = 'button';
+      b.id = 'shot-tab-' + k;
+      b.setAttribute('role', 'tab');
+      b.setAttribute('aria-controls', 'shot-stage');
+      b.append(el('span', '', g.tab));
+      b.addEventListener('click', () => showShot(k, false, true));
+      b.addEventListener('keydown', e => {
+        const last = tabs.length - 1;
+        const n = { ArrowRight: k === last ? 0 : k + 1, ArrowLeft: k === 0 ? last : k - 1, Home: 0, End: last }[e.key];
+        if (n === undefined) return;
+        e.preventDefault();
+        e.stopPropagation();
+        showShot(n, true, true);
+      });
+      tabBox.append(b);
+      return b;
+    });
+    if (list.length) showShot(0, false, animate);
+  }
+
+  // arrows on the screenshot
+  for (const [cls, step, label] of [['s-prev', -1, 'Previous screen'], ['s-next', 1, 'Next screen']]) {
+    const b = el('button', 's-nav ' + cls, step < 0 ? '‹' : '›');
+    b.type = 'button';
+    b.setAttribute('aria-label', label);
+    b.addEventListener('click', () => showShot((cur + step + list.length) % list.length, false, true));
+    shot.append(b);
+  }
+
+  showProject(0, false, false);
   addEventListener('load', () => BUILDS.forEach(g => { const p = new Image(); p.src = g.image; }));
 
   /* ---- Reviews (Cloudflare Worker) ---- */
