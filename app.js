@@ -12,7 +12,8 @@
    ========================================================= */
 const PROJECTS = {
   blackwood: { name: 'Gothic Horror', lead: 'Blackwood Cathedral: a foggy horror map I built, a gothic cathedral with a dark candle-lit nave, a graveyard and a dead forest.' },
-  spiral: { name: 'Battleground', lead: 'Spiral Crater: a battleground map I built, inspired by Gurren Lagann and The Strongest Battlegrounds.' }
+  spiral: { name: 'Battleground', lead: 'Spiral Crater: a battleground map I built, inspired by Gurren Lagann and The Strongest Battlegrounds.' },
+  hood: { name: 'Customer Build', lead: 'Rich suburb: a commission map I built for WheresThatFox, a neighborhood of 84 homes with connected streets, a park, hills and a sunset sky.' }
 };
 
 const BUILDS = [
@@ -45,7 +46,15 @@ const BUILDS = [
   { project: 'spiral', tab: 'Dungeon', image: 'images/dungeon.jpg', alt: 'A stone brick corridor with timber frames, candle lanterns on chains and walls, barrels and crates at a strapped door',
     caption: 'Inside the tunnel: stone bricks, timber frames, candle lanterns that cast shadows, barrels, crates and a double door.' },
   { project: 'spiral', tab: 'Houses', image: 'images/houses.jpg', alt: 'Close-up of a wooden house with warm lit windows, shutters, curtains and an iron wall lantern',
-    caption: 'House details up close: lit windows with curtains and shelves, open shutters and an iron lantern with a candle.' }
+    caption: 'House details up close: lit windows with curtains and shelves, open shutters and an iron lantern with a candle.' },
+  { project: 'hood', tab: 'Overview', image: 'images/hood-overview.jpg', alt: 'Aerial view at sunset over a suburb of houses, tree-lined streets and a cul-de-sac, with hills behind',
+    caption: 'The whole neighborhood from above: a road loop, cross streets, cul-de-sacs and fenced yards, framed by hills.' },
+  { project: 'hood', tab: 'Street', image: 'images/hood-street.jpg', alt: 'Player-height view down a tree-lined suburban street with sidewalks, mailboxes, picket fences and cars in driveways',
+    caption: 'Street level: sidewalks, street trees, mailboxes, picket fences and cars parked in the driveways.' },
+  { project: 'hood', tab: 'Park', image: 'images/hood-park.jpg', alt: 'A neighborhood park with winding paths, lamps, benches, swings and trees between houses at sunset',
+    caption: 'The park: winding paths, lamps, benches and a swing set, tucked between the backyards.' },
+  { project: 'hood', tab: 'Cul-de-sac', image: 'images/hood-cul-de-sac.jpg', alt: 'A cul-de-sac with a planted island, houses with garages and an American flag, and mountains in the haze',
+    caption: 'A cul-de-sac with a planted island, brick and siding homes and mountains in the evening haze.' }
 ];
 
 const SKILLS = ['map layout', 'gothic architecture', 'horror atmosphere', 'lighting', 'fog and weather', 'terrain',
