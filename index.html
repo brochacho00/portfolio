@@ -10,12 +10,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,600;0,700;1,600&family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
 
 <div class="sky" aria-hidden="true">
   <div class="layer z0 on"></div>
+  <div class="layer z0"></div>
   <div class="layer z1"></div>
   <div class="layer z2"></div>
   <div class="layer z3"></div>
@@ -63,7 +64,10 @@
 
   <nav class="menu" role="tablist" aria-orientation="vertical" aria-label="Sections">
     <button class="m-item" role="tab" id="m-games" aria-controls="p-games" aria-selected="true" tabindex="0">
-      <span class="m-title">Builds</span><span class="m-sub">Maps and builds I made</span>
+      <span class="m-title">Builds</span><span class="m-sub">Personal builds, no client</span>
+    </button>
+    <button class="m-item" role="tab" id="m-clients" aria-controls="p-clients" aria-selected="false" tabindex="-1">
+      <span class="m-title">Customer Builds</span><span class="m-sub">Work I did for clients</span>
     </button>
     <button class="m-item" role="tab" id="m-skills" aria-controls="p-skills" aria-selected="false" tabindex="-1">
       <span class="m-title">Skills</span><span class="m-sub">Three parts, one drill</span>
@@ -88,7 +92,7 @@
     <!-- Builds: filled from the BUILDS array at the top of app.js -->
     <section class="panel" id="p-games" role="tabpanel" aria-labelledby="m-games">
       <div class="viewer">
-        <div id="shot-stage" role="tabpanel">
+        <div class="shot-stage" role="tabpanel">
           <figure class="screen">
             <img alt="" width="1914" height="778">
             <span class="s-count" aria-hidden="true"></span>
@@ -98,6 +102,23 @@
         <p class="lead-line">Spiral Crater: a battleground map I built, inspired by Gurren Lagann and The Strongest Battlegrounds.</p>
         <p class="cap" aria-live="polite"></p>
         <ul class="skills" aria-label="What I work on"></ul>
+        <p class="hint"><kbd>←</kbd><kbd>→</kbd> to switch screens</p>
+      </div>
+    </section>
+
+    <!-- Customer Builds: filled from CLIENT_PROJECTS in app.js -->
+    <section class="panel" id="p-clients" role="tabpanel" aria-labelledby="m-clients" hidden>
+      <div class="viewer">
+        <div class="shot-stage" role="tabpanel">
+          <figure class="screen">
+            <img alt="" width="1914" height="778">
+            <span class="s-count" aria-hidden="true"></span>
+          </figure>
+        </div>
+        <div class="tabs" role="tablist" aria-label="Build screens"></div>
+        <p class="client-tag"><span></span></p>
+        <p class="lead-line"></p>
+        <p class="cap" aria-live="polite"></p>
         <p class="hint"><kbd>←</kbd><kbd>→</kbd> to switch screens</p>
       </div>
     </section>
@@ -273,6 +294,6 @@
   <footer class="foot">© 2026 Brochacho · Fan design inspired by Gurren Lagann</footer>
 </div>
 
-<script src="app.js?v=10"></script>
+<script src="app.js?v=11"></script>
 </body>
 </html>

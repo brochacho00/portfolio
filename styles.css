@@ -741,3 +741,19 @@ kbd { font: inherit; padding: 2px 6px; border: 1px solid var(--rule); }
 .s-nav:focus-visible { outline: 2px solid var(--flame); outline-offset: 2px; }
 .s-prev { left: 12px; }
 .s-next { right: 12px; }
+
+/* Customer Builds: client name tag */
+.client-tag { margin: 2px 0 0; }
+.client-tag span {
+  display: inline-block;
+  padding: 6px 16px;
+  font-family: var(--f-hud);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: .02em;
+  color: var(--ink);
+  background: var(--bone);
+  border: 2px solid var(--flame);
+  transform: skewX(-14deg);
+}

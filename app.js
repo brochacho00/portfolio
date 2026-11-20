@@ -12,8 +12,12 @@
    ========================================================= */
 const PROJECTS = {
   blackwood: { name: 'Gothic Horror', lead: 'Blackwood Cathedral: a foggy horror map I built, a gothic cathedral with a dark candle-lit nave, a graveyard and a dead forest.' },
-  spiral: { name: 'Battleground', lead: 'Spiral Crater: a battleground map I built, inspired by Gurren Lagann and The Strongest Battlegrounds.' },
-  hood: { name: 'Customer Build', lead: 'Rich suburb: a commission map I built for WheresThatFox, a neighborhood of 84 homes with connected streets, a park, hills and a sunset sky.' }
+  spiral: { name: 'Battleground', lead: 'Spiral Crater: a battleground map I built, inspired by Gurren Lagann and The Strongest Battlegrounds.' }
+};
+
+/* CLIENT_PROJECTS: "Customer Builds" section. client = name shown as @tag. Screens go in BUILDS with the same key. */
+const CLIENT_PROJECTS = {
+  hood: { name: 'Rich Suburb', client: 'WheresThatFox', lead: 'A neighborhood of 84 homes with connected streets, a park, hills and a sunset sky.' }
 };
 
 const BUILDS = [
@@ -84,13 +88,14 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
   /* ---- Sections: each menu item is one altitude zone ---- */
   const ZONES = [
     { zone: 'UNDERGROUND', alt: -250, stars: 0 },
+    { zone: 'CAVERN', alt: -120, stars: 0 },
     { zone: 'SURFACE', alt: 0, stars: .12 },
     { zone: 'SKY', alt: 12000, stars: .35 },
     { zone: 'STRATOSPHERE', alt: 50000, stars: .65 },
     { zone: 'ORBIT', alt: 400000, stars: 1 },
     { zone: 'GALAXY', alt: Infinity, stars: 1 }
   ];
-  const HASH = { games: 0, skills: 1, method: 2, reviews: 3, about: 4, contact: 5 };
+  const HASH = { games: 0, clients: 1, skills: 2, method: 3, reviews: 4, about: 5, contact: 6 };
   const items = [...document.querySelectorAll('.m-item')];
   const panels = items.map(b => document.getElementById(b.getAttribute('aria-controls')));
   const layers = [...document.querySelectorAll('.sky .layer')];
@@ -164,109 +169,118 @@ const WORKER_URL = 'https://fatih-reviews.fatihinceoglu2009.workers.dev';
     show(n, onMenu);
   });
 
-  /* ---- Builds: map tabs on top (PROJECTS), screen tabs for the chosen map ---- */
-  const shotStage = document.getElementById('shot-stage');
-  const shot = shotStage.querySelector('.screen');
-  const shotImg = shot.querySelector('img');
-  const shotCount = shot.querySelector('.s-count');
-  const shotCap = document.querySelector('.viewer .cap');
-  const shotLead = document.querySelector('.viewer .lead-line');
-  const tabBox = document.querySelector('.viewer .tabs');
-  const pad = n => String(n).padStart(2, '0');
-  const skillList = document.querySelector('.viewer .skills');
-  SKILLS.forEach(s => skillList.append(el('li', '', s)));
+  /* ---- Builds viewers: map tabs on top, screen tabs for the chosen map ---- */
+  function setupViewer(panel, projects, idp) {
+    const view = panel.querySelector('.viewer');
+    const shotStage = view.querySelector('.shot-stage');
+    const shot = shotStage.querySelector('.screen');
+    const shotImg = shot.querySelector('img');
+    const shotCount = shot.querySelector('.s-count');
+    const shotCap = view.querySelector('.cap');
+    const shotLead = view.querySelector('.lead-line');
+    const tabBox = view.querySelector('.tabs');
+    const clientTag = view.querySelector('.client-tag');
+    const pad = n => String(n).padStart(2, '0');
+    shotStage.id = idp + 'shot-stage';
 
-  const projBox = el('div', 'projects');
-  projBox.setAttribute('role', 'tablist');
-  projBox.setAttribute('aria-label', 'Maps');
-  shotStage.parentNode.insertBefore(projBox, shotStage);
+    const projBox = el('div', 'projects');
+    projBox.setAttribute('role', 'tablist');
+    projBox.setAttribute('aria-label', 'Maps');
+    shotStage.parentNode.insertBefore(projBox, shotStage);
 
-  let list = [];
-  let tabs = [];
-  let cur = 0;
+    let list = [];
+    let tabs = [];
+    let cur = 0;
 
-  function showShot(k, focus, animate) {
-    const g = list[k];
-    cur = k;
-    tabs.forEach((t, j) => {
-      t.setAttribute('aria-selected', String(j === k));
-      t.tabIndex = j === k ? 0 : -1;
-    });
-    shotStage.setAttribute('aria-labelledby', tabs[k].id);
-    shotImg.src = g.image;
-    shotImg.alt = g.alt;
-    shotCap.textContent = g.caption;
-    shotCount.textContent = pad(k + 1) + ' / ' + pad(list.length);
-    if (animate && !reduce) {
-      shot.classList.remove('swap');
-      void shot.offsetWidth;
-      shot.classList.add('swap');
+    function showShot(k, focus, animate) {
+      const g = list[k];
+      cur = k;
+      tabs.forEach((t, j) => {
+        t.setAttribute('aria-selected', String(j === k));
+        t.tabIndex = j === k ? 0 : -1;
+      });
+      shotStage.setAttribute('aria-labelledby', tabs[k].id);
+      shotImg.src = g.image;
+      shotImg.alt = g.alt;
+      shotCap.textContent = g.caption;
+      shotCount.textContent = pad(k + 1) + ' / ' + pad(list.length);
+      if (animate && !reduce) {
+        shot.classList.remove('swap');
+        void shot.offsetWidth;
+        shot.classList.add('swap');
+      }
+      if (focus) tabs[k].focus();
     }
-    if (focus) tabs[k].focus();
-  }
 
-  const projKeys = Object.keys(PROJECTS);
-  const projBtns = projKeys.map((key, i) => {
-    const b = el('button', 'chip proj');
-    b.type = 'button';
-    b.id = 'proj-tab-' + i;
-    b.setAttribute('role', 'tab');
-    b.append(el('span', '', PROJECTS[key].name));
-    b.addEventListener('click', () => showProject(i, false, true));
-    b.addEventListener('keydown', e => {
-      const last = projBtns.length - 1;
-      const n = { ArrowRight: i === last ? 0 : i + 1, ArrowLeft: i === 0 ? last : i - 1 }[e.key];
-      if (n === undefined) return;
-      e.preventDefault();
-      e.stopPropagation();
-      showProject(n, true, true);
-    });
-    projBox.append(b);
-    return b;
-  });
-
-  function showProject(i, focus, animate) {
-    const key = projKeys[i];
-    projBtns.forEach((b, j) => {
-      b.setAttribute('aria-selected', String(j === i));
-      b.tabIndex = j === i ? 0 : -1;
-    });
-    if (focus) projBtns[i].focus();
-    shotLead.textContent = PROJECTS[key].lead;
-    list = BUILDS.filter(g => g.project === key);
-    tabBox.textContent = '';
-    tabs = list.map((g, k) => {
-      const b = el('button', 'chip');
+    const projKeys = Object.keys(projects);
+    const projBtns = projKeys.map((key, i) => {
+      const b = el('button', 'chip proj');
       b.type = 'button';
-      b.id = 'shot-tab-' + k;
+      b.id = idp + 'proj-tab-' + i;
       b.setAttribute('role', 'tab');
-      b.setAttribute('aria-controls', 'shot-stage');
-      b.append(el('span', '', g.tab));
-      b.addEventListener('click', () => showShot(k, false, true));
+      b.append(el('span', '', projects[key].name));
+      b.addEventListener('click', () => showProject(i, false, true));
       b.addEventListener('keydown', e => {
-        const last = tabs.length - 1;
-        const n = { ArrowRight: k === last ? 0 : k + 1, ArrowLeft: k === 0 ? last : k - 1, Home: 0, End: last }[e.key];
+        const last = projBtns.length - 1;
+        const n = { ArrowRight: i === last ? 0 : i + 1, ArrowLeft: i === 0 ? last : i - 1 }[e.key];
         if (n === undefined) return;
         e.preventDefault();
         e.stopPropagation();
-        showShot(n, true, true);
+        showProject(n, true, true);
       });
-      tabBox.append(b);
+      projBox.append(b);
       return b;
     });
-    if (list.length) showShot(0, false, animate);
+
+    function showProject(i, focus, animate) {
+      const key = projKeys[i];
+      projBtns.forEach((b, j) => {
+        b.setAttribute('aria-selected', String(j === i));
+        b.tabIndex = j === i ? 0 : -1;
+      });
+      if (focus) projBtns[i].focus();
+      shotLead.textContent = projects[key].lead;
+      if (clientTag) clientTag.firstElementChild.textContent = '@' + projects[key].client;
+      list = BUILDS.filter(g => g.project === key);
+      tabBox.textContent = '';
+      tabs = list.map((g, k) => {
+        const b = el('button', 'chip');
+        b.type = 'button';
+        b.id = idp + 'shot-tab-' + k;
+        b.setAttribute('role', 'tab');
+        b.setAttribute('aria-controls', shotStage.id);
+        b.append(el('span', '', g.tab));
+        b.addEventListener('click', () => showShot(k, false, true));
+        b.addEventListener('keydown', e => {
+          const last = tabs.length - 1;
+          const n = { ArrowRight: k === last ? 0 : k + 1, ArrowLeft: k === 0 ? last : k - 1, Home: 0, End: last }[e.key];
+          if (n === undefined) return;
+          e.preventDefault();
+          e.stopPropagation();
+          showShot(n, true, true);
+        });
+        tabBox.append(b);
+        return b;
+      });
+      if (list.length) showShot(0, false, animate);
+    }
+
+    // arrows on the screenshot
+    for (const [cls, step, label] of [['s-prev', -1, 'Previous screen'], ['s-next', 1, 'Next screen']]) {
+      const b = el('button', 's-nav ' + cls, step < 0 ? '‹' : '›');
+      b.type = 'button';
+      b.setAttribute('aria-label', label);
+      b.addEventListener('click', () => showShot((cur + step + list.length) % list.length, false, true));
+      shot.append(b);
+    }
+
+    showProject(0, false, false);
   }
 
-  // arrows on the screenshot
-  for (const [cls, step, label] of [['s-prev', -1, 'Previous screen'], ['s-next', 1, 'Next screen']]) {
-    const b = el('button', 's-nav ' + cls, step < 0 ? '‹' : '›');
-    b.type = 'button';
-    b.setAttribute('aria-label', label);
-    b.addEventListener('click', () => showShot((cur + step + list.length) % list.length, false, true));
-    shot.append(b);
-  }
-
-  showProject(0, false, false);
+  const skillList = document.querySelector('#p-games .skills');
+  SKILLS.forEach(s => skillList.append(el('li', '', s)));
+  setupViewer(document.getElementById('p-games'), PROJECTS, 'g-');
+  setupViewer(document.getElementById('p-clients'), CLIENT_PROJECTS, 'c-');
   addEventListener('load', () => BUILDS.forEach(g => { const p = new Image(); p.src = g.image; }));
 
   /* ---- Reviews (Cloudflare Worker) ---- */
